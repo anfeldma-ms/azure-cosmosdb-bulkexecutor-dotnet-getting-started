@@ -55,6 +55,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bogus, Version=29.0.2.0, Culture=neutral, PublicKeyToken=fa1bb3f3f218129a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bogus.29.0.2\lib\net40\Bogus.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Azure.CosmosDB.BulkImport, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.CosmosDB.BulkExecutor.1.1.0\lib\net451\Microsoft.Azure.CosmosDB.BulkImport.dll</HintPath>
       <Private>True</Private>

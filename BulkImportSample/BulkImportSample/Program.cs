@@ -147,10 +147,7 @@ namespace BulkImportSample
                 Trace.TraceInformation(String.Format("Generating {0} documents to import for batch {1}", numberOfDocumentsPerBatch, i));
                 for (int j = 0; j < numberOfDocumentsPerBatch; j++)
                 {
-                    string partitionKeyValue = (prefix + j).ToString();
-                    string id = partitionKeyValue + Guid.NewGuid().ToString();
-
-                    documentsToImportInBatch.Add(Utils.GenerateRandomDocumentString(id, partitionKeyProperty, partitionKeyValue));
+                    documentsToImportInBatch.Add(Utils.GenerateRandomDocumentString());
                 }
 
                 // Invoke bulk import API.
