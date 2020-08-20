@@ -15,6 +15,7 @@ namespace BulkImportSample
     using Microsoft.Azure.Documents.Client;
     using Microsoft.Azure.CosmosDB.BulkExecutor;
     using Microsoft.Azure.CosmosDB.BulkExecutor.BulkImport;
+    using System.Collections.ObjectModel;
 
     class Program
     {
@@ -128,6 +129,43 @@ namespace BulkImportSample
             // Set retries to 0 to pass control to bulk executor.
             client.ConnectionPolicy.RetryOptions.MaxRetryWaitTimeInSeconds = 0;
             client.ConnectionPolicy.RetryOptions.MaxRetryAttemptsOnThrottledRequests = 0;
+
+            if (bool.Parse(ConfigurationManager.AppSettings["ShouldConfigureIndex"]))
+            {
+
+                // Configure indexing policy
+                ResourceResponse<DocumentCollection> containerResponse = await client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName));
+                // Set the indexing mode to consistent
+                containerResponse.Resource.IndexingPolicy.IndexingMode = IndexingMode.Consistent;
+                // Set the indexing to automatic
+                containerResponse.Resource.IndexingPolicy.Automatic = true;
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/partitionKey/*" });
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/reportId/*" });
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/parameterDateTime/*" });
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/parameterId/*" });
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/tailNumber/*" });
+                // Add an included path
+                containerResponse.Resource.IndexingPolicy.IncludedPaths.Add(new IncludedPath { Path = "/flightLegId/*" });
+                // Add an excluded path
+                //containerResponse.Resource.IndexingPolicy.ExcludedPaths.Add(new ExcludedPath { Path = "/*" });
+                // Add an excluded path
+                //containerResponse.Resource.IndexingPolicy.ExcludedPaths.Add(new ExcludedPath { Path = "/\"_etag\"/?" });
+                // Add a composite index
+
+                //containerResponse.Resource.IndexingPolicy.CompositeIndexes.Add(new Collection<CompositePath> { new CompositePath() { Path = "/parameterDateTime", Order = CompositePathSortOrder.Descending }, new CompositePath() { Path = "/partitionKey", Order = CompositePathSortOrder.Descending } });
+
+                // Update container with changes
+                ResourceResponse<DocumentCollection> result = await client.ReplaceDocumentCollectionAsync(containerResponse.Resource);
+
+                Console.WriteLine("Updated index. Result: " + result.StatusCode);
+
+                while (true) ;
+            }
 
             BulkImportResponse bulkImportResponse = null;
             long totalNumberOfDocumentsInserted = 0;
