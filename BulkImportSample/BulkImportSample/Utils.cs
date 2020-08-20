@@ -70,35 +70,65 @@ namespace BulkImportSample
         static Random rnd = new Random();
         const string dlmtr = ",\n";
 
+        static int numParametricId = 0, parametricIdPerTailNumber = 30;
+        static int numReportId = 0, reportsPerParametricId = 275;
+        static int numEntries = 0, entriesPerReport = 222;
+        static string tailNumber = get_unique_string(5, true);
+        static int parameterId = rnd.Next(100000, 999999);
+        static int doc_type = rnd.Next(0, 968);
+        static int reportId = rnd.Next(100000000, 999999999);
+         
+        static void getNextTailNumber()
+        { // Get next tailNumber, after checking if any other fields need to be updated, and then zero dependent field
+            tailNumber = get_unique_string(5, true);
+            numParametricId = 0;
+        }
+
+        static void getNextParametricId()
+        { // Get next ParameterId, after checking if any other fields need to be updated, and then zero dependent field
+            if (numParametricId >= parametricIdPerTailNumber)
+            { // If parametric-id-per-tail-number have been generated
+                getNextTailNumber();
+            }
+            parameterId = rnd.Next(100000, 999999);
+            doc_type = rnd.Next(0, 968);
+            numReportId = 0;
+            numParametricId++;
+        }
+
+        static void getNextReportId()
+        { // Get next ReportId, after checking if any other fields need to be updated, and then zero dependent field
+            if (numReportId >= reportsPerParametricId)
+            { // If reports-per-parametric-id have been generated
+                getNextParametricId();
+            }
+            reportId = rnd.Next(100000000, 999999999);
+            numEntries = 0;
+            numReportId++;
+        }
+
+
+
         static internal String GenerateRandomDocumentString()
-        {
+        { // Generate report parameter entry, after checking if any other fields need to be updated
 
-            /*
+            if (numEntries >= entriesPerReport)
+            { // If entries-per-report have been generated
+                getNextReportId(); 
+            }
 
-            Bogus.Faker
+            numEntries++;
 
-            var foodInteractions = new Bogus.Faker<PurchaseFoodOrBeverage>()
-    .RuleFor(i => i.id, (fake) => Guid.NewGuid().ToString())
-    .RuleFor(i => i.type, (fake) => nameof(PurchaseFoodOrBeverage))
-    .RuleFor(i => i.unitPrice, (fake) => Math.Round(fake.Random.Decimal(1.99m, 15.99m), 2))
-    .RuleFor(i => i.quantity, (fake) => fake.Random.Number(1, 5))
-    .RuleFor(i => i.totalPrice, (fake, user) => Math.Round(user.unitPrice * user.quantity, 2))
-    .GenerateLazy(500);
-
-            */
-
-
-            int parameterId = rnd.Next(100000, 999999);
-            int reportId = rnd.Next(100000000, 999999999);
+            
             DateTime parameterDateTimeObj = RandomDay(DateTime.Today.AddDays(-365));
             string parameterDateTime = parameterDateTimeObj.ToString("yyyy-MM-ddTHH:mm:ss.fffz");
             string lastUpdatedTime = RandomDay(parameterDateTimeObj).ToString("yyyy-MM-ddTHH:mm:ss.fffz");
-            string tailNumber = get_unique_string(5, true);
+            
             string partitionKey = tailNumber + "-" + parameterId;
             string id = partitionKey + "-" + reportId + "-" + parameterDateTime;
             int flightLegId = rnd.Next(100000000, 999999999);
 
-            int doc_type = rnd.Next(0, 968);
+            
 
             string doc = "";
 
@@ -269,13 +299,13 @@ namespace BulkImportSample
         {
             DateTime start = new DateTime(1995, 1, 1);
             int range = (DateTime.Today - start).Days;
-            return start.AddDays(gen.Next(range));
+            return start.AddDays(gen.Next(range)).AddHours(gen.Next(24)).AddMinutes(gen.Next(60)).AddSeconds(gen.Next(60)).AddMilliseconds(gen.Next(1000));
         }
 
         static DateTime RandomDay(DateTime start)
         {
             int range = (DateTime.Today - start).Days;
-            return start.AddDays(gen.Next(range));
+            return start.AddDays(gen.Next(range)).AddHours(gen.Next(24)).AddMinutes(gen.Next(60)).AddSeconds(gen.Next(60)).AddMilliseconds(gen.Next(1000));
         }
 
     }

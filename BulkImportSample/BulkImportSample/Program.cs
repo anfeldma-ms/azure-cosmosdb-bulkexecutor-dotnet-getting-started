@@ -175,7 +175,8 @@ namespace BulkImportSample
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
-            for (int i = 0; i < numberOfBatches; i++)
+//            for (int i = 0; i < numberOfBatches; i++)
+            for (long i = 0; ; i++)
             {
                 // Generate JSON-serialized documents to import.
 
